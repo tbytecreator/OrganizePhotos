@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  organize_photos:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: organize_photos_web
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./arquivos:/app/arquivos
+      - ./organizados:/app/organizados
+    environment:
+      - RUST_LOG=info
+    restart: unless-stopped
+    networks:
+      - organize_network
+
+networks:
+  organize_network:
+    driver: bridge

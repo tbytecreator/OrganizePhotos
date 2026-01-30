@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OrganizePhotos - Organize suas fotos por data</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>📸 OrganizePhotos</h1>
+                <p class="subtitle">Organize automaticamente suas fotos por data de modificação</p>
+            </div>
+        </header>
+
+        <main>
+            <section class="info-section">
+                <div class="info-card">
+                    <h2>Como funciona?</h2>
+                    <p>Selecione uma pasta com seus arquivos, escolha o destino e organize automaticamente em pastas por data (YYYY-MM-DD).</p>
+                </div>
+            </section>
+
+            <section class="organize-section">
+                <div class="organize-card">
+                    <h2>⚙️ Selecione os diretórios</h2>
+                    
+                    <!-- Seleção de Diretório de Origem -->
+                    <div class="directory-selector-group">
+                        <div class="selector-label">
+                            <span class="label-icon">📁</span>
+                            <span class="label-text">Diretório de Origem</span>
+                            <span class="selected-path" id="sourcePath">/</span>
+                        </div>
+                        <button class="btn btn-browse" id="browsSourceBtn">
+                            <span class="btn-icon">🔍</span>
+                            <span>Selecionar Pasta</span>
+                        </button>
+                    </div>
+
+                    <!-- File Browser Modal - Origem -->
+                    <div id="sourceBrowserModal" class="modal" style="display: none;">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h3>Selecione a Pasta de Origem</h3>
+                                <button class="modal-close" id="closeSourceModal">&times;</button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="browser-path">
+                                    <input type="text" id="sourceBrowserPath" class="path-input" value="/">
+                                    <button class="btn-icon-small" id="sourceBrowserRefresh" title="Atualizar">🔄</button>
+                                </div>
+                                <div id="sourceBrowserList" class="browser-list">
+                                    <!-- Será preenchido dinamicamente -->
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-secondary" id="cancelSourceBtn">Cancelar</button>
+                                <button class="btn btn-primary" id="confirmSourceBtn">Confirmar Seleção</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Seleção de Diretório de Destino -->
+                    <div class="directory-selector-group">
+                        <div class="selector-label">
+                            <span class="label-icon">📂</span>
+                            <span class="label-text">Diretório de Destino</span>
+                            <span class="selected-path" id="outputPath">/</span>
+                        </div>
+                        <button class="btn btn-browse" id="browseOutputBtn">
+                            <span class="btn-icon">🔍</span>
+                            <span>Selecionar Pasta</span>
+                        </button>
+                    </div>
+
+                    <!-- File Browser Modal - Destino -->
+                    <div id="outputBrowserModal" class="modal" style="display: none;">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h3>Selecione a Pasta de Destino</h3>
+                                <button class="modal-close" id="closeOutputModal">&times;</button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="browser-path">
+                                    <input type="text" id="outputBrowserPath" class="path-input" value="/">
+                                    <button class="btn-icon-small" id="outputBrowserRefresh" title="Atualizar">🔄</button>
+                                </div>
+                                <div id="outputBrowserList" class="browser-list">
+                                    <!-- Será preenchido dinamicamente -->
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-secondary" id="cancelOutputBtn">Cancelar</button>
+                                <button class="btn btn-primary" id="confirmOutputBtn">Confirmar Seleção</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botão Organizar -->
+                    <button id="organizeBtn" class="btn btn-primary btn-organize">
+                        <span class="btn-icon">🚀</span>
+                        <span>Organizar Arquivos</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Seção de Resultados -->
+            <section id="resultsSection" class="results-section" style="display: none;">
+                <div class="results-card">
+                    <h2>✅ Resultados</h2>
+                    
+                    <div id="successMessage" class="success-message"></div>
+                    
+                    <div class="stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Arquivos processados:</span>
+                            <span id="filesProcessed" class="stat-value">0</span>
+                        </div>
+                    </div>
+
+                    <div id="filesList" class="files-list">
+                        <!-- Será preenchido dinamicamente -->
+                    </div>
+
+                    <button id="resetBtn" class="btn btn-secondary">
+                        <span class="btn-icon">🔄</span>
+                        <span>Nova Organização</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Seção de Carregamento -->
+            <section id="loadingSection" class="loading-section" style="display: none;">
+                <div class="spinner"></div>
+                <p>Organizando seus arquivos...</p>
+            </section>
+
+            <!-- Seção de Erro -->
+            <section id="errorSection" class="error-section" style="display: none;">
+                <div class="error-card">
+                    <h3>❌ Erro</h3>
+                    <p id="errorMessage"></p>
+                    <button id="retryBtn" class="btn btn-secondary">Tentar novamente</button>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 OrganizePhotos | Desenvolvido com ❤️ em Rust</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

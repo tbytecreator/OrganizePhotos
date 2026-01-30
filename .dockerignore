@@ -1,0 +1,11 @@
+target/
+.git/
+.gitignore
+README.md
+LICENSE
+*.swp
+*.swo
+*~
+.DS_Store
+.vscode/
+.idea/

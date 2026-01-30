@@ -1,0 +1,88 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Rust: Debug (LLDB)",
+            "type": "lldb",
+            "request": "launch",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=organize_files",
+                    "--package=organize_files"
+                ],
+                "filter": {
+                    "name": "organize_files",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "sourceLanguages": ["rust"],
+            "stopOnEntry": false,
+            "console": "integratedTerminal",
+            "env": {
+                "RUST_BACKTRACE": "1",
+                "RUST_LOG": "debug"
+            },
+            "preLaunchTask": "rust: cargo check"
+        },
+        {
+            "name": "Rust: Release Build",
+            "type": "lldb",
+            "request": "launch",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--release",
+                    "--bin=organize_files",
+                    "--package=organize_files"
+                ],
+                "filter": {
+                    "name": "organize_files",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "sourceLanguages": ["rust"],
+            "stopOnEntry": false,
+            "console": "integratedTerminal",
+            "env": {
+                "RUST_LOG": "info"
+            }
+        },
+        {
+            "name": "Rust: Run with Cargo",
+            "type": "lldb",
+            "request": "launch",
+            "cargo": {
+                "args": [
+                    "run",
+                    "--bin=organize_files"
+                ],
+                "filter": {
+                    "name": "organize_files",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "sourceLanguages": ["rust"],
+            "stopOnEntry": false,
+            "console": "integratedTerminal",
+            "env": {
+                "RUST_BACKTRACE": "full",
+                "RUST_LOG": "debug"
+            }
+        },
+        {
+            "name": "Rust: Attach to Process",
+            "type": "lldb",
+            "request": "attach",
+            "pid": "${command:pickProcess}",
+            "sourceLanguages": ["rust"]
+        }
+    ],
+    "compounds": []
+}

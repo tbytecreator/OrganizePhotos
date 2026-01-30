@@ -1,0 +1,12 @@
+{
+    "recommendations": [
+        "rust-lang.rust-analyzer",
+        "vadimcn.vscode-lldb",
+        "tamasfe.even-better-toml",
+        "serayuzgur.crates",
+        "mutantdino.resourcemonitor",
+        "ms-vscode.makefile-tools",
+        "usernamehw.errorlens",
+        "ms-vscode-remote.remote-containers"
+    ]
+}
