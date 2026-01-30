@@ -9,8 +9,10 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./arquivos:/app/arquivos
-      - ./organizados:/app/organizados
+      # Mapeie os diretórios do host para o container
+      # Utilize caminhos absolutos ou variáveis de ambiente para máxima flexibilidade
+      - ${SOURCE_DIR:-./arquivos}:/app/arquivos
+      - ${OUTPUT_DIR:-./organizados}:/app/organizados
     environment:
       - RUST_LOG=info
     restart: unless-stopped

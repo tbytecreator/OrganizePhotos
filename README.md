@@ -22,15 +22,52 @@ data de modificação com interface intuitiva para seleção de diretórios.
 
 ### 1. Usando Docker Compose (Recomendado)
 
+#### Opção 1a: Com arquivo `.env` (Mais simples)
+
 ```bash
 # Clonar/entrar no diretório do projeto
 cd OrganizePhotos
 
+# Copiar arquivo de exemplo
+cp .env.example .env
+
+# Editar .env com seus caminhos
+# Linux/Mac: nano .env
+# Windows: notepad .env
+# Altere os valores:
+# SOURCE_DIR=/caminho/para/suas/fotos
+# OUTPUT_DIR=/caminho/para/fotos/organizadas
+
 # Iniciar a aplicação
 docker-compose up -d
 
-# Acessar a aplicação
-# Abrir no navegador: http://localhost:8080
+# Acessar a aplicação no navegador: http://localhost:8080
+```
+
+#### Opção 1b: Com variáveis inline (Sem arquivo .env)
+
+```bash
+# Iniciar com variáveis de ambiente na mesma linha
+
+SOURCE_DIR=/home/tbytecreator/Documents OUTPUT_DIR=/home/tbytecreato/Pictures docker-compose up -d
+
+# Ou para Windows (PowerShell):
+
+$env:SOURCE_DIR="C:/Users/seu_usuario/Imagens"; $env:OUTPUT_DIR="C:/Users/seu_usuario/Imagens_Organizadas"; docker-compose up -d
+
+# Acessar a aplicação no navegador: http://localhost:8080
+```
+
+#### Opção 1c: Editar docker-compose.yml diretamente
+
+```bash
+# Abrir e editar o arquivo docker-compose.yml
+# Substituir os valores entre ${}:
+# volumes:
+#   - /caminho/absoluto/suas/fotos:/app/arquivos
+#   - /caminho/absoluto/fotos/organizadas:/app/organizados
+
+docker-compose up -d
 ```
 
 ### 2. Usando Docker Diretamente
