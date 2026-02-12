@@ -8,12 +8,16 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      # Mapeie os diretórios do host para o container
-      # Utilize caminhos absolutos ou variáveis de ambiente para máxima flexibilidade
-      - ${SOURCE_DIR:-E:/Imagens}:/app/arquivos
-      - ${OUTPUT_DIR:-E:/Imagens_Organizadas}:/app/organizados
+      # Mapeie o home do usuário para permitir acesso ao sistema de arquivos do host
+      - ${HOME}:${HOME}
+      # Mapeie raízes do sistema para leitura (opcional, descomente se necessário)
+      # - /media:/media:ro
+      # - /mnt:/mnt:ro
+      # Diretórios locais do container
+      - ./static:/app/static:ro
     environment:
       - RUST_LOG=info
+      - HOST_HOME=${HOME}
     restart: unless-stopped
     networks:
       - organize_network

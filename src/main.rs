@@ -53,6 +53,11 @@ struct DirectoryRequest {
     path: String,
 }
 
+#[derive(Serialize)]
+struct UserContextResponse {
+    home_dir: String,
+}
+
 // Rota para organizar arquivos
 async fn organize_handler(req: web::Json<OrganizeRequest>) -> HttpResponse {
     let source_dir = req.source_dir.trim();
@@ -125,26 +130,13 @@ async fn organize_handler(req: web::Json<OrganizeRequest>) -> HttpResponse {
 // Rota para listar diretórios
 async fn list_directory_handler(req: web::Json<DirectoryRequest>) -> HttpResponse {
     let path = req.path.trim();
-    let base_dir = PathBuf::from("/app/arquivos");
 
     // Usar "/" como padrão para o diretório raiz
     let target_path = if path.is_empty() || path == "/" {
-        base_dir.clone()
+        PathBuf::from("/")
     } else {
-        let requested = PathBuf::from(path);
-        if requested.is_absolute() {
-            requested
-        } else {
-            base_dir.join(requested)
-        }
+        PathBuf::from(path)
     };
-
-    if !target_path.starts_with(&base_dir) {
-        return HttpResponse::BadRequest().json(StatusResponse {
-            status: "error".to_string(),
-            message: "Acesso permitido apenas dentro de /app/arquivos".to_string(),
-        });
-    }
 
     // Verificar se o caminho existe
     if !target_path.exists() {
@@ -171,6 +163,10 @@ async fn list_directory_handler(req: web::Json<DirectoryRequest>) -> HttpRespons
                 if let Ok(entry) = entry {
                     if let Ok(metadata) = entry.metadata() {
                         if let Some(file_name) = entry.file_name().to_str() {
+                            // Filtrar arquivos e pastas ocultas (que começam com .)
+                            if file_name.starts_with('.') {
+                                continue;
+                            }
                             let path_str = entry.path().to_string_lossy().to_string();
                             entries.push(DirectoryEntry {
                                 name: file_name.to_string(),
@@ -224,6 +220,15 @@ async fn health_handler() -> HttpResponse {
     })
 }
 
+// Rota para obter contexto do usuário
+async fn user_context_handler() -> HttpResponse {
+    let home_dir = std::env::var("HOST_HOME")
+        .or_else(|_| std::env::var("HOME"))
+        .unwrap_or_else(|_| "/home".to_string());
+
+    HttpResponse::Ok().json(UserContextResponse { home_dir })
+}
+
 fn organize_file(source: &Path, output_base: &str) -> std::io::Result<PathBuf> {
     let metadata = fs::metadata(source)?;
     let modified = metadata.modified()?;
@@ -253,6 +258,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .wrap(middleware::Logger::default())
             .route("/health", web::get().to(health_handler))
+            .route("/api/user-context", web::get().to(user_context_handler))
             .route("/api/organize", web::post().to(organize_handler))
             .route(
                 "/api/list-directory",

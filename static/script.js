@@ -1,120 +1,198 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // Elements
-    const organizeBtn = document.getElementById('organizeBtn');
-    const resetBtn = document.getElementById('resetBtn');
-    const retryBtn = document.getElementById('retryBtn');
-    
-    // Source browser
-    const browseSourceBtn = document.getElementById('browsSourceBtn');
-    const sourceBrowserModal = document.getElementById('sourceBrowserModal');
-    const closeSourceModal = document.getElementById('closeSourceModal');
-    const cancelSourceBtn = document.getElementById('cancelSourceBtn');
-    const confirmSourceBtn = document.getElementById('confirmSourceBtn');
-    const sourceBrowserPath = document.getElementById('sourceBrowserPath');
-    const sourceBrowserList = document.getElementById('sourceBrowserList');
-    const sourceBrowserRefresh = document.getElementById('sourceBrowserRefresh');
-    const sourcePathDisplay = document.getElementById('sourcePath');
-    
-    // Output browser
-    const browseOutputBtn = document.getElementById('browseOutputBtn');
-    const outputBrowserModal = document.getElementById('outputBrowserModal');
-    const closeOutputModal = document.getElementById('closeOutputModal');
-    const cancelOutputBtn = document.getElementById('cancelOutputBtn');
-    const confirmOutputBtn = document.getElementById('confirmOutputBtn');
-    const outputBrowserPath = document.getElementById('outputBrowserPath');
-    const outputBrowserList = document.getElementById('outputBrowserList');
-    const outputBrowserRefresh = document.getElementById('outputBrowserRefresh');
-    const outputPathDisplay = document.getElementById('outputPath');
-    
-    // State
-    let selectedSourcePath = '/app/arquivos';
-    let selectedOutputPath = '/app/organizados';
-    let currentSourceBrowserPath = '/app/arquivos';
-    let currentOutputBrowserPath = '/app/organizados';
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        // Adicionar variável global de status
+        window.appState = {
+            loadUserContextComplete: false,
+            selectedSourcePath: null,
+            selectedOutputPath: null,
+            homeDir: null,
+            error: null
+        };
+        
+        // Adicionar handler global para erros
+        window.addEventListener('error', (event) => {
+            console.error('[ERROR] Erro não capturado:', event.error);
+            console.error('[ERROR] Message:', event.message);
+            console.error('[ERROR] Filename:', event.filename);
+            console.error('[ERROR] Lineno:', event.lineno);
+            if (window.appState) {
+                window.appState.error = event.message;
+            }
+        });
+        
+        // Elements
+        const organizeBtn = document.getElementById('organizeBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const retryBtn = document.getElementById('retryBtn');
+        
+        // Source browser
+        const browseSourceBtn = document.getElementById('browsSourceBtn');
+        const sourceBrowserModal = document.getElementById('sourceBrowserModal');
+        const closeSourceModal = document.getElementById('closeSourceModal');
+        const cancelSourceBtn = document.getElementById('cancelSourceBtn');
+        const confirmSourceBtn = document.getElementById('confirmSourceBtn');
+        const sourceBrowserPath = document.getElementById('sourceBrowserPath');
+        const sourceBrowserList = document.getElementById('sourceBrowserList');
+        const sourceBrowserRefresh = document.getElementById('sourceBrowserRefresh');
+        const sourcePathDisplay = document.getElementById('sourcePath');
+        
+        console.log('[INIT] Elementos do DOM carregados:');
+        console.log('  sourceBrowserPath:', sourceBrowserPath);
+        console.log('  sourcePathDisplay:', sourcePathDisplay);
+        console.log('  sourcePathDisplay.textContent INICIAL:', sourcePathDisplay.textContent);
 
-    // Verificar saúde do servidor
-    checkServerHealth();
+        // Output browser
+        const browseOutputBtn = document.getElementById('browseOutputBtn');
+        const outputBrowserModal = document.getElementById('outputBrowserModal');
+        const closeOutputModal = document.getElementById('closeOutputModal');
+        const cancelOutputBtn = document.getElementById('cancelOutputBtn');
+        const confirmOutputBtn = document.getElementById('confirmOutputBtn');
+        const outputBrowserPath = document.getElementById('outputBrowserPath');
+        const outputBrowserList = document.getElementById('outputBrowserList');
+        const outputBrowserRefresh = document.getElementById('outputBrowserRefresh');
+        const outputPathDisplay = document.getElementById('outputPath');
+        
+        // State
+        let selectedSourcePath = '/home';
+        let selectedOutputPath = '/home';
+        let currentSourceBrowserPath = '/home';
+        let currentOutputBrowserPath = '/home';
 
-    // Event listeners - Source Browser
-    browseSourceBtn.addEventListener('click', () => {
-        currentSourceBrowserPath = selectedSourcePath;
-        sourceBrowserPath.value = currentSourceBrowserPath;
-        loadDirectory('source');
-        sourceBrowserModal.style.display = 'flex';
-    });
+        // Verificar saúde do servidor e carregar contexto ANTES de configurar listeners
+        checkServerHealth();
+        await loadUserContext();
+        
+        // LOG: Verificar estado após loadUserContext
+        console.log('[INIT-FINAL] Depois de loadUserContext:');
+        console.log('  selectedSourcePath:', selectedSourcePath);
+        console.log('  window.appState.selectedSourcePath:', window.appState.selectedSourcePath);
+        console.log('  sourcePathDisplay.textContent:', sourcePathDisplay.textContent);
+        console.log('  window.appState.loadUserContextComplete:', window.appState.loadUserContextComplete);
 
-    closeSourceModal.addEventListener('click', () => {
-        sourceBrowserModal.style.display = 'none';
-    });
-
-    cancelSourceBtn.addEventListener('click', () => {
-        sourceBrowserModal.style.display = 'none';
-    });
-
-    confirmSourceBtn.addEventListener('click', () => {
-        selectedSourcePath = currentSourceBrowserPath;
-        sourcePathDisplay.textContent = selectedSourcePath;
-        sourceBrowserModal.style.display = 'none';
-    });
-
-    sourceBrowserRefresh.addEventListener('click', () => {
-        loadDirectory('source');
-    });
-
-    sourceBrowserPath.addEventListener('keyup', (e) => {
-        if (e.key === 'Enter') {
-            currentSourceBrowserPath = sourceBrowserPath.value;
+        // Event listeners - Source Browser
+        browseSourceBtn.addEventListener('click', () => {
+            console.log('[CLICK] Botão browse clicado');
+            console.log('  selectedSourcePath ANTES:', selectedSourcePath);
+            currentSourceBrowserPath = selectedSourcePath;
+            console.log('  currentSourceBrowserPath DEPOIS:', currentSourceBrowserPath);
+            sourceBrowserPath.value = currentSourceBrowserPath;
+            console.log('  sourceBrowserPath.value:', sourceBrowserPath.value);
             loadDirectory('source');
-        }
-    });
+            sourceBrowserModal.style.display = 'flex';
+        });
 
-    // Event listeners - Output Browser
-    browseOutputBtn.addEventListener('click', () => {
-        currentOutputBrowserPath = selectedOutputPath;
-        outputBrowserPath.value = currentOutputBrowserPath;
-        loadDirectory('output');
-        outputBrowserModal.style.display = 'flex';
-    });
-
-    closeOutputModal.addEventListener('click', () => {
-        outputBrowserModal.style.display = 'none';
-    });
-
-    cancelOutputBtn.addEventListener('click', () => {
-        outputBrowserModal.style.display = 'none';
-    });
-
-    confirmOutputBtn.addEventListener('click', () => {
-        selectedOutputPath = currentOutputBrowserPath;
-        outputPathDisplay.textContent = selectedOutputPath;
-        outputBrowserModal.style.display = 'none';
-    });
-
-    outputBrowserRefresh.addEventListener('click', () => {
-        loadDirectory('output');
-    });
-
-    outputBrowserPath.addEventListener('keyup', (e) => {
-        if (e.key === 'Enter') {
-            currentOutputBrowserPath = outputBrowserPath.value;
-            loadDirectory('output');
-        }
-    });
-
-    // Event listeners - Main
-    organizeBtn.addEventListener('click', handleOrganize);
-    resetBtn.addEventListener('click', resetForm);
-    retryBtn.addEventListener('click', resetForm);
-
-    // Fechar modal ao clicar fora
-    window.addEventListener('click', (e) => {
-        if (e.target === sourceBrowserModal) {
+        closeSourceModal.addEventListener('click', () => {
             sourceBrowserModal.style.display = 'none';
-        }
-        if (e.target === outputBrowserModal) {
+        });
+
+        cancelSourceBtn.addEventListener('click', () => {
+            sourceBrowserModal.style.display = 'none';
+        });
+
+        confirmSourceBtn.addEventListener('click', () => {
+            selectedSourcePath = currentSourceBrowserPath;
+            sourcePathDisplay.textContent = selectedSourcePath;
+            sourceBrowserModal.style.display = 'none';
+        });
+
+        sourceBrowserRefresh.addEventListener('click', () => {
+            loadDirectory('source');
+        });
+
+        sourceBrowserPath.addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') {
+                currentSourceBrowserPath = sourceBrowserPath.value;
+                loadDirectory('source');
+            }
+        });
+
+        // Event listeners - Output Browser
+        browseOutputBtn.addEventListener('click', () => {
+            currentOutputBrowserPath = selectedOutputPath;
+            outputBrowserPath.value = currentOutputBrowserPath;
+            loadDirectory('output');
+            outputBrowserModal.style.display = 'flex';
+        });
+
+        closeOutputModal.addEventListener('click', () => {
             outputBrowserModal.style.display = 'none';
+        });
+
+        cancelOutputBtn.addEventListener('click', () => {
+            outputBrowserModal.style.display = 'none';
+        });
+
+        confirmOutputBtn.addEventListener('click', () => {
+            selectedOutputPath = currentOutputBrowserPath;
+            outputPathDisplay.textContent = selectedOutputPath;
+            outputBrowserModal.style.display = 'none';
+        });
+
+        outputBrowserRefresh.addEventListener('click', () => {
+            loadDirectory('output');
+        });
+
+        outputBrowserPath.addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') {
+                currentOutputBrowserPath = outputBrowserPath.value;
+                loadDirectory('output');
+            }
+        });
+
+        // Event listeners - Main
+        organizeBtn.addEventListener('click', handleOrganize);
+        resetBtn.addEventListener('click', resetForm);
+        retryBtn.addEventListener('click', resetForm);
+
+        // Fechar modal ao clicar fora
+        window.addEventListener('click', (e) => {
+            if (e.target === sourceBrowserModal) {
+                sourceBrowserModal.style.display = 'none';
+            }
+            if (e.target === outputBrowserModal) {
+                outputBrowserModal.style.display = 'none';
+            }
+        });
+
+    async function loadUserContext() {
+        try {
+            console.log('[DEBUG] Iniciando loadUserContext...');
+            const response = await fetch('/api/user-context');
+            console.log('[DEBUG] Resposta status:', response.status);
+            if (response.ok) {
+                const data = await response.json();
+                console.log('[DEBUG] Contexto do usuário carregado:', data);
+                console.log('[DEBUG] home_dir recebido:', data.home_dir);
+                selectedSourcePath = data.home_dir;
+                selectedOutputPath = data.home_dir;
+                currentSourceBrowserPath = data.home_dir;
+                currentOutputBrowserPath = data.home_dir;
+                
+                // Atualizar estado global
+                window.appState.homeDir = data.home_dir;
+                window.appState.selectedSourcePath = selectedSourcePath;
+                window.appState.selectedOutputPath = selectedOutputPath;
+                
+                console.log('[DEBUG] ANTES de atualizar textContent:', sourcePathDisplay.textContent);
+                console.log('[DEBUG] sourcePathDisplay element:', sourcePathDisplay);
+                console.log('[DEBUG] sourcePathDisplay.nodeType:', sourcePathDisplay.nodeType);
+                sourcePathDisplay.textContent = data.home_dir;
+                console.log('[DEBUG] DEPOIS de atualizar textContent:', sourcePathDisplay.textContent);
+                
+                outputPathDisplay.textContent = data.home_dir;
+                console.log('[DEBUG] Variáveis atualizadas para:', data.home_dir);
+                console.log('[DEBUG] selectedSourcePath agora é:', selectedSourcePath);
+                window.appState.loadUserContextComplete = true;
+            } else {
+                console.error('[DEBUG] Response não OK. Status:', response.status);
+                window.appState.error = 'Response not OK: ' + response.status;
+            }
+        } catch (error) {
+            console.error('[DEBUG] Erro ao carregar contexto:', error.message);
+            console.warn('Erro ao carregar contexto do usuário: ' + error.message);
+            window.appState.error = error.message;
         }
-    });
+    }
 
     async function checkServerHealth() {
         try {
@@ -342,5 +420,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const sizes = ['B', 'KB', 'MB', 'GB'];
         const i = Math.floor(Math.log(bytes) / Math.log(k));
         return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+    }
+    } catch (error) {
+        console.error('[FATAL] Erro fatal no DOMContentLoaded:', error);
+        if (window.appState) {
+            window.appState.error = error.toString();
+            console.error('[FATAL] appState error set to:', window.appState.error);
+        }
     }
 });

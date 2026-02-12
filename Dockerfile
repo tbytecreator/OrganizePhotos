@@ -1,5 +1,5 @@
 # Stage 1: Build
-FROM rust:latest as builder
+FROM rust:latest AS builder
 
 WORKDIR /app
 
@@ -24,9 +24,6 @@ WORKDIR /app
 # Copiar a aplicação compilada do stage anterior
 COPY --from=builder /app/target/release/organize_files /app/organize_files
 COPY --from=builder /app/static ./static
-
-# Criar diretórios necessários
-RUN mkdir -p ./arquivos ./organizados
 
 # Exposar porta
 EXPOSE 8080
