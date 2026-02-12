@@ -1,0 +1,10 @@
+E:\Dev\tbytecreator\OrganizePhotos\target\debug\deps\mime_guess-78408846adc2652c.d: C:\Users\Tremyen\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\mime_guess-2.0.5\src\lib.rs C:\Users\Tremyen\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\mime_guess-2.0.5\src\impl_bin_search.rs C:\Users\Tremyen\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\mime_guess-2.0.5\src\mime_types.rs E:\Dev\tbytecreator\OrganizePhotos\target\debug\build\mime_guess-a4bfaf87ca61206e\out\mime_types_generated.rs
+
+E:\Dev\tbytecreator\OrganizePhotos\target\debug\deps\libmime_guess-78408846adc2652c.rmeta: C:\Users\Tremyen\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\mime_guess-2.0.5\src\lib.rs C:\Users\Tremyen\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\mime_guess-2.0.5\src\impl_bin_search.rs C:\Users\Tremyen\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\mime_guess-2.0.5\src\mime_types.rs E:\Dev\tbytecreator\OrganizePhotos\target\debug\build\mime_guess-a4bfaf87ca61206e\out\mime_types_generated.rs
+
+C:\Users\Tremyen\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\mime_guess-2.0.5\src\lib.rs:
+C:\Users\Tremyen\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\mime_guess-2.0.5\src\impl_bin_search.rs:
+C:\Users\Tremyen\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\mime_guess-2.0.5\src\mime_types.rs:
+E:\Dev\tbytecreator\OrganizePhotos\target\debug\build\mime_guess-a4bfaf87ca61206e\out\mime_types_generated.rs:
+
+# env-dep:MIME_TYPES_GENERATED_PATH=E:\\Dev\\tbytecreator\\OrganizePhotos\\target\\debug\\build\\mime_guess-a4bfaf87ca61206e\\out\\mime_types_generated.rs

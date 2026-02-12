@@ -1,4 +1,3 @@
-version: '3.8'
 
 services:
   organize_photos:
@@ -11,8 +10,8 @@ services:
     volumes:
       # Mapeie os diretórios do host para o container
       # Utilize caminhos absolutos ou variáveis de ambiente para máxima flexibilidade
-      - ${SOURCE_DIR:-./arquivos}:/app/arquivos
-      - ${OUTPUT_DIR:-./organizados}:/app/organizados
+      - ${SOURCE_DIR:-E:/Imagens}:/app/arquivos
+      - ${OUTPUT_DIR:-E:/Imagens_Organizadas}:/app/organizados
     environment:
       - RUST_LOG=info
     restart: unless-stopped

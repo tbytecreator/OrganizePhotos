@@ -3,17 +3,20 @@
 ## Opção 1: Usando arquivo `.env` (Recomendado)
 
 1. Crie um arquivo `.env` no diretório raiz do projeto:
+
 ```bash
 cp .env.example .env
 ```
 
-2. Edite o arquivo `.env` com seus caminhos:
+2.Edite o arquivo `.env` com seus caminhos:
+
 ```env
 SOURCE_DIR=/home/seu_usuario/Imagens
 OUTPUT_DIR=/home/seu_usuario/Imagens_Organizadas
 ```
 
-3. Inicie o container:
+3.Inicie o container:
+
 ```bash
 docker-compose up -d
 ```

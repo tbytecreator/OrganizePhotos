@@ -27,10 +27,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const outputPathDisplay = document.getElementById('outputPath');
     
     // State
-    let selectedSourcePath = '/';
-    let selectedOutputPath = '/';
-    let currentSourceBrowserPath = '/';
-    let currentOutputBrowserPath = '/';
+    let selectedSourcePath = '/app/arquivos';
+    let selectedOutputPath = '/app/organizados';
+    let currentSourceBrowserPath = '/app/arquivos';
+    let currentOutputBrowserPath = '/app/organizados';
 
     // Verificar saúde do servidor
     checkServerHealth();

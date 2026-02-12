@@ -1,5 +1,5 @@
 use actix_files::Files;
-use actix_web::{web, App, HttpResponse, HttpServer, middleware};
+use actix_web::{middleware, web, App, HttpResponse, HttpServer};
 use chrono::{DateTime, Local};
 use serde::{Deserialize, Serialize};
 use std::fs;
@@ -57,7 +57,7 @@ struct DirectoryRequest {
 async fn organize_handler(req: web::Json<OrganizeRequest>) -> HttpResponse {
     let source_dir = req.source_dir.trim();
     let output_base = req.output_dir.trim();
-    
+
     // Validar se os diretórios existem
     if !Path::new(source_dir).exists() {
         return HttpResponse::BadRequest().json(StatusResponse {
@@ -65,7 +65,7 @@ async fn organize_handler(req: web::Json<OrganizeRequest>) -> HttpResponse {
             message: format!("Diretório de origem não existe: {}", source_dir),
         });
     }
-    
+
     if !Path::new(output_base).exists() {
         if let Err(e) = fs::create_dir_all(output_base) {
             return HttpResponse::InternalServerError().json(StatusResponse {
@@ -74,19 +74,19 @@ async fn organize_handler(req: web::Json<OrganizeRequest>) -> HttpResponse {
             });
         }
     }
-    
+
     let mut files = Vec::new();
     let mut file_count = 0;
-    
+
     for entry in WalkDir::new(source_dir)
         .into_iter()
         .filter_map(|e| e.ok())
         .filter(|e| e.path().is_file())
     {
         let file_path = entry.path();
-        
+
         match organize_file(file_path, output_base) {
-            Ok(destination) => {
+            Ok(_destination) => {
                 if let Ok(metadata) = fs::metadata(file_path) {
                     let modified = metadata.modified().ok();
                     let date = modified
@@ -95,9 +95,10 @@ async fn organize_handler(req: web::Json<OrganizeRequest>) -> HttpResponse {
                             Some(dt.format("%Y-%m-%d").to_string())
                         })
                         .unwrap_or_default();
-                    
+
                     files.push(FileInfo {
-                        name: file_path.file_name()
+                        name: file_path
+                            .file_name()
                             .and_then(|n| n.to_str())
                             .unwrap_or("unknown")
                             .to_string(),
@@ -112,7 +113,7 @@ async fn organize_handler(req: web::Json<OrganizeRequest>) -> HttpResponse {
             }
         }
     }
-    
+
     HttpResponse::Ok().json(OrganizeResponse {
         success: true,
         message: "Arquivos organizados com sucesso!".to_string(),
@@ -124,14 +125,27 @@ async fn organize_handler(req: web::Json<OrganizeRequest>) -> HttpResponse {
 // Rota para listar diretórios
 async fn list_directory_handler(req: web::Json<DirectoryRequest>) -> HttpResponse {
     let path = req.path.trim();
-    
+    let base_dir = PathBuf::from("/app/arquivos");
+
     // Usar "/" como padrão para o diretório raiz
     let target_path = if path.is_empty() || path == "/" {
-        PathBuf::from("/")
+        base_dir.clone()
     } else {
-        PathBuf::from(path)
+        let requested = PathBuf::from(path);
+        if requested.is_absolute() {
+            requested
+        } else {
+            base_dir.join(requested)
+        }
     };
-    
+
+    if !target_path.starts_with(&base_dir) {
+        return HttpResponse::BadRequest().json(StatusResponse {
+            status: "error".to_string(),
+            message: "Acesso permitido apenas dentro de /app/arquivos".to_string(),
+        });
+    }
+
     // Verificar se o caminho existe
     if !target_path.exists() {
         return HttpResponse::BadRequest().json(StatusResponse {
@@ -139,7 +153,7 @@ async fn list_directory_handler(req: web::Json<DirectoryRequest>) -> HttpRespons
             message: format!("Caminho não existe: {}", path),
         });
     }
-    
+
     // Verificar se é um diretório
     if !target_path.is_dir() {
         return HttpResponse::BadRequest().json(StatusResponse {
@@ -147,9 +161,9 @@ async fn list_directory_handler(req: web::Json<DirectoryRequest>) -> HttpRespons
             message: format!("O caminho não é um diretório: {}", path),
         });
     }
-    
+
     let mut entries = Vec::new();
-    
+
     // Listar conteúdo do diretório
     match fs::read_dir(&target_path) {
         Ok(entries_iter) => {
@@ -176,7 +190,7 @@ async fn list_directory_handler(req: web::Json<DirectoryRequest>) -> HttpRespons
             });
         }
     }
-    
+
     // Ordenar: diretórios primeiro, depois arquivos
     entries.sort_by(|a, b| {
         if a.is_dir == b.is_dir {
@@ -185,14 +199,16 @@ async fn list_directory_handler(req: web::Json<DirectoryRequest>) -> HttpRespons
             b.is_dir.cmp(&a.is_dir)
         }
     });
-    
+
     // Calcular caminho do pai
     let parent_path = if target_path.parent().is_some() && target_path != PathBuf::from("/") {
-        target_path.parent().map(|p| p.to_string_lossy().to_string())
+        target_path
+            .parent()
+            .map(|p| p.to_string_lossy().to_string())
     } else {
         None
     };
-    
+
     HttpResponse::Ok().json(DirectoryListing {
         current_path: target_path.to_string_lossy().to_string(),
         entries,
@@ -213,18 +229,18 @@ fn organize_file(source: &Path, output_base: &str) -> std::io::Result<PathBuf> {
     let modified = metadata.modified()?;
     let datetime: DateTime<Local> = modified.into();
     let date_folder = datetime.format("%Y-%m-%d").to_string();
-    
+
     let filename = source
         .file_name()
         .and_then(|name| name.to_str())
         .unwrap_or("arquivo_desconhecido");
-    
+
     let destination_dir = Path::new(output_base).join(&date_folder);
     let destination_file = destination_dir.join(filename);
-    
+
     fs::create_dir_all(&destination_dir)?;
     fs::copy(source, &destination_file)?;
-    
+
     Ok(destination_file)
 }
 
@@ -232,13 +248,16 @@ fn organize_file(source: &Path, output_base: &str) -> std::io::Result<PathBuf> {
 async fn main() -> std::io::Result<()> {
     println!("🚀 Iniciando OrganizePhotos Web Server na porta 8080...");
     println!("📖 Acesse: http://localhost:8080");
-    
+
     HttpServer::new(|| {
         App::new()
             .wrap(middleware::Logger::default())
             .route("/health", web::get().to(health_handler))
             .route("/api/organize", web::post().to(organize_handler))
-            .route("/api/list-directory", web::post().to(list_directory_handler))
+            .route(
+                "/api/list-directory",
+                web::post().to(list_directory_handler),
+            )
             .service(Files::new("/", "./static").index_file("index.html"))
     })
     .bind("0.0.0.0:8080")?

@@ -1,1 +1,1 @@
-/home/tbytecreator/Dev/tbc/rust/OrganizePhotos/target/debug/organize_files: /home/tbytecreator/Dev/tbc/rust/OrganizePhotos/src/main.rs
+E:\Dev\tbytecreator\OrganizePhotos\target\debug\organize_files.exe: E:\Dev\tbytecreator\OrganizePhotos\src\main.rs

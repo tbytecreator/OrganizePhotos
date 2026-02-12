@@ -53,7 +53,7 @@ SOURCE_DIR=/home/tbytecreator/Documents OUTPUT_DIR=/home/tbytecreato/Pictures do
 
 # Ou para Windows (PowerShell):
 
-$env:SOURCE_DIR="C:/Users/seu_usuario/Imagens"; $env:OUTPUT_DIR="C:/Users/seu_usuario/Imagens_Organizadas"; docker-compose up -d
+$env:SOURCE_DIR="E:/Imagens"; $env:OUTPUT_DIR="E:/Imagens_Organizadas"; docker-compose up -d
 
 # Acessar a aplicação no navegador: http://localhost:8080
 ```
